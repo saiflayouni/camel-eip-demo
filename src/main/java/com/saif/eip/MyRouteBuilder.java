@@ -12,6 +12,8 @@ public class MyRouteBuilder extends RouteBuilder {
      * Let's configure the Camel routing rules using Java code...
      */
     public void configure() {
+        errorHandler(deadLetterChannel("file:target/orders/failed"));
+
         /*
         from("file:src/orders?noop=true")
                 .choice()
@@ -38,7 +40,7 @@ public class MyRouteBuilder extends RouteBuilder {
             from("file:src/orders?noop=true")
                     .setHeader("type", xpath("/order/type/text()"))
                     .setHeader("priority", xpath("/order/priority/text()"))
-                    .log("→ Routing ${header.type} - ${header.priority} order")
+                    .log("→ [${header.CamelFileName}] type: ${header.type} | priority: ${header.priority}")
                     .toD("file:target/orders/${header.type}-${header.priority}");
 
 
