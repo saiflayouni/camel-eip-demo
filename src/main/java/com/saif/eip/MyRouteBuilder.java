@@ -12,15 +12,35 @@ public class MyRouteBuilder extends RouteBuilder {
      * Let's configure the Camel routing rules using Java code...
      */
     public void configure() {
+        /*
         from("file:src/orders?noop=true")
                 .choice()
-                .when(xpath("/order/type = 'widget'"))
-                .log("→ Widget Inventory: ${body}")
-                .when(xpath("/order/type = 'gadget'"))
-                .log("→ Gadget Inventory: ${body}")
+                /*
+                .when(xpath("/order/type ='widget' and /order/priority = 'urgent'"))
+                .log("→ URGENT Widget Order: ${body}")
+                .to("file:target/orders/widget-urgent")
+                //
+                .when(xpath("/order/type ='widget' and /order/priority = 'normal'"))
+                .log("→ NORMAL Widget Order: ${body}")
+                .to("file:target/orders/widget-normal")
+                //
+                .when(xpath("/order/type ='gadget' and /order/priority = 'urgent'"))
+                .log("→ URGENT gadget Order: ${body}")
+                .to("file:target/orders/gadget-urgent")
+                //
+                .when(xpath("/order/type ='gadget' and /order/priority = 'normal'"))
+                .log("→ NORMAL Widget Order: ${body}")
+                .to("file:target/orders/gadget-normal")
                 .otherwise()
-                        .log("→UNknown")
+                .log("→ Unknown order")
                 .endChoice();
+                */
+            from("file:src/orders?noop=true")
+                    .setHeader("type", xpath("/order/type/text()"))
+                    .setHeader("priority", xpath("/order/priority/text()"))
+                    .log("→ Routing ${header.type} - ${header.priority} order")
+                    .toD("file:target/orders/${header.type}-${header.priority}");
+
 
     }
 
